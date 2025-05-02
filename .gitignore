@@ -1,0 +1,16 @@
+# Ignore virtual environment
+venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# VSCode or IDE files
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+
+# Environment files
+.env
