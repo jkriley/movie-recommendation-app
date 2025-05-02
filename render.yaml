@@ -1,7 +1,7 @@
 services:
   - type: web
-    name: movie-recommendation-app
+    name: movie-recommendations-4u
     env: python
     plan: free
-    buildCommand: ""
-    startCommand: "python app.py"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"

@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from recommendation_model import get_recommendations
+from recommendation_model import get_recommendations, load_data
 import os
 
 app = Flask(__name__)
@@ -10,28 +10,34 @@ def home():
 
 @app.route('/recommend', methods=['POST'])
 def recommend():
-    # Check if request is JSON (e.g. API call) or from a web form
     if request.is_json:
         data = request.get_json()
-        genre = data.get('genre', '').lower()
-        decade = data.get('decade', '').lower()
+        genre = data.get('genre', '').lower().strip()
+        decade = data.get('decade', '').lower().strip()
     else:
-        genre = request.form.get('genre', '').lower()
-        decade = request.form.get('decade', '').lower()
+        genre = request.form.get('genre', '').lower().strip()
+        decade = request.form.get('decade', '').lower().strip()
 
-    # Debug print to terminal
-    print("User selected genre (normalized):", genre)
-    print("User selected decade (normalized):", decade)
+    print("User selected genre:", genre)
+    print("User selected decade:", decade)
 
-    # Get recommendations
-    recommendations = get_recommendations(genre, decade)
+    try:
+        recommendations = get_recommendations(genre, decade)
+    except Exception as e:
+        print("❌ Error during recommendation:", e)
+        recommendations = ["Something went wrong. Please try again."]
 
-    # Return to frontend or API
     if request.is_json:
         return jsonify(recommendations)
     else:
         return render_template('index.html', recommendations=recommendations)
 
+@app.route('/health')
+def health():
+    return jsonify({'status': 'ok'})
+
 if __name__ == '__main__':
+    print("📦 Preloading model data...")
+    load_data()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
